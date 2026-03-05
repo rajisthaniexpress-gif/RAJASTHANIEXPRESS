@@ -38,15 +38,15 @@
             width: 100%;
             max-width: 1200px;
             text-align: center;
-            padding: 0 10px;
+            padding: 0 8px; /* reduced from 10px */
         }
         .header {
             background: var(--header-bg);
-            padding: 15px 10px;
+            padding: 12px 8px; /* reduced from 15px */
             border-bottom: 2px solid var(--gold);
             width: 100%;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
+            margin-bottom: 12px; /* reduced from 20px */
         }
         .header-content {
             max-width: 1200px;
@@ -93,10 +93,10 @@
         }
         .footer {
             background: var(--footer-bg);
-            padding: 20px 10px;
+            padding: 15px 8px; /* reduced from 20px */
             border-top: 2px solid var(--gold);
             width: 100%;
-            margin-top: 30px;
+            margin-top: 20px; /* reduced from 30px */
             font-size: 0.75rem;
             color: var(--gray);
             text-align: center;
@@ -107,13 +107,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 8px; /* reduced */
         }
         .footer-links {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
+            gap: 15px; /* reduced */
         }
         .footer-links a {
             color: var(--gold);
@@ -126,7 +126,7 @@
         .copyright {
             font-size: 0.7rem;
         }
-        /* LOADING OVERLAY – fixed, full screen, centered */
+        /* LOADING OVERLAY – full screen, no gaps */
         #loading-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -137,7 +137,7 @@
             align-items: center;
             z-index: 9999;
             transition: opacity 0.5s;
-            pointer-events: none; /* allow clicking through after fade */
+            pointer-events: none;
         }
         .spinner {
             width: 50px; height: 50px;
@@ -165,9 +165,9 @@
             background: var(--card-bg);
             border: 2px solid var(--gold);
             border-radius: 20px;
-            padding: 20px 10px;
+            padding: 15px 8px; /* reduced from 20px */
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
+            margin-bottom: 15px; /* reduced */
         }
         .market-name {
             display: flex;
@@ -176,7 +176,7 @@
             gap: 8px;
             font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 12px; /* reduced */
             flex-wrap: wrap;
         }
         .live-badge {
@@ -205,9 +205,8 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px; /* reduced */
         }
-        /* scroll-to-top button */
         #scrollTopBtn {
             position: fixed;
             right: 20px;
@@ -253,13 +252,13 @@
         .open { background: rgba(0,255,136,0.1); color: var(--green); }
         .closed { background: rgba(255,77,77,0.1); color: var(--red); }
         .timing-info {
-            margin-top: 10px;
+            margin-top: 8px; /* reduced */
             font-size: 0.7rem;
             color: var(--gray);
         }
         .chart-title {
             color: var(--gold);
-            margin: 15px 0 10px;
+            margin: 12px 0 8px; /* reduced */
             text-transform: uppercase;
             font-weight: 600;
             font-size: 1.1rem;
@@ -270,7 +269,7 @@
             border: 2px solid var(--border);
             overflow-x: auto;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px; /* reduced */
             -webkit-overflow-scrolling: touch;
         }
         table {
@@ -322,27 +321,27 @@
         }
         .special-result { color: var(--red-header); }
         .features-section {
-            margin: 20px 0;
+            margin: 15px 0; /* reduced */
             background: var(--card-bg);
             border-radius: 16px;
-            padding: 12px;
+            padding: 10px; /* reduced */
             border: 1px solid var(--gold);
         }
         .tab-buttons {
             display: flex;
             flex-wrap: wrap;
-            gap: 5px;
+            gap: 4px; /* reduced */
             justify-content: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px; /* reduced */
         }
         .tab-btn {
             background: var(--tab-inactive);
             border: none;
             color: var(--gray);
-            padding: 8px 12px;  /* bigger touch target */
+            padding: 8px 10px; /* slightly adjusted */
             border-radius: 30px;
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.7rem; /* slightly smaller */
             cursor: pointer;
             transition: 0.2s;
             border: 1px solid transparent;
@@ -361,27 +360,26 @@
         @keyframes fade { from { opacity:0; } to { opacity:1; } }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 8px;
-            margin-top: 8px;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 6px; /* reduced */
+            margin-top: 6px; /* reduced */
         }
         .stat-card {
             background: rgba(255,255,255,0.05);
             border-radius: 10px;
-            padding: 10px;
+            padding: 8px; /* reduced */
             border-left: 3px solid var(--gold);
         }
         .stat-label {
-            font-size: 0.65rem;
+            font-size: 0.6rem; /* smaller */
             color: var(--gray);
             text-transform: uppercase;
         }
         .stat-value {
-            font-size: 1.2rem;
+            font-size: 1.1rem; /* slightly smaller */
             font-weight: 700;
             color: var(--gold);
         }
-        /* Mini tables – scrollable on mobile */
         .mini-table {
             width: 100%;
             border-collapse: collapse;
@@ -400,10 +398,10 @@
         }
         .mini-table th,
         .mini-table td {
-            padding: 8px 6px;
+            padding: 8px 4px;
             text-align: center;
             word-break: break-word;
-            min-width: 60px;
+            min-width: 55px;
         }
         .mini-table th {
             background: var(--red-header);
@@ -414,20 +412,19 @@
             border-bottom: 1px solid #333;
             color: var(--white);
         }
-        /* calendar grid – responsive */
         .calendar-grid {
             display: grid;
-            grid-template-columns: repeat(7, minmax(30px, 1fr));
+            grid-template-columns: repeat(7, minmax(28px, 1fr));
             gap: 2px;
             background: rgba(0,0,0,0.3);
-            padding: 5px;
+            padding: 4px;
             border-radius: 8px;
         }
         .cal-day {
             background: #1e293b;
             border-radius: 4px;
-            padding: 4px 1px;
-            font-size: 0.6rem;
+            padding: 3px 1px;
+            font-size: 0.55rem;
             color: var(--gray);
             text-align: center;
         }
@@ -437,27 +434,92 @@
             font-weight: 600;
         }
         .cal-day .day-num { font-weight: bold; }
-        .cal-day .jodi-small { font-size: 0.55rem; }
+        .cal-day .jodi-small { font-size: 0.5rem; }
         .chart-container-small {
-            height: 180px;
-            margin-top: 8px;
+            height: 160px; /* slightly reduced */
+            margin-top: 6px;
         }
         #jodiChartCanvas, #freqChart {
-            max-height: 180px;
+            max-height: 160px;
             width: 100% !important;
         }
         .disclaimer {
-            margin-top: 25px;
-            padding: 12px;
+            margin-top: 15px; /* reduced */
+            padding: 10px; /* reduced */
             background: rgba(255, 255, 255, 0.03);
             border-radius: 8px;
-            font-size: 0.65rem;
+            font-size: 0.6rem; /* smaller */
             color: var(--gray);
-            line-height: 1.4;
+            line-height: 1.3;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .disclaimer b { color: var(--gold); }
-        .loader { color: var(--gold); margin: 10px; font-size:0.8rem; }
+        .loader { color: var(--gold); margin: 8px; font-size:0.75rem; }
+
+        /* Extra mobile fine-tuning */
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 0 5px;
+            }
+            .header {
+                padding: 10px 5px;
+                margin-bottom: 8px;
+            }
+            .site-title {
+                font-size: 1.5rem;
+            }
+            .tagline {
+                font-size: 0.8rem;
+            }
+            .result-card {
+                padding: 12px 5px;
+                margin-bottom: 10px;
+            }
+            .display-area {
+                margin-bottom: 8px;
+            }
+            .patti {
+                font-size: 0.9rem;
+            }
+            .jodi {
+                font-size: 2rem;
+                min-width: 60px;
+            }
+            .footer {
+                padding: 12px 5px;
+                margin-top: 15px;
+            }
+            .footer-content {
+                gap: 5px;
+            }
+            .footer-links {
+                gap: 10px;
+            }
+            .features-section {
+                padding: 8px;
+                margin: 10px 0;
+            }
+            .tab-btn {
+                padding: 6px 8px;
+                font-size: 0.65rem;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 5px;
+            }
+            .stat-card {
+                padding: 6px;
+            }
+            .stat-value {
+                font-size: 1rem;
+            }
+            .calendar-grid {
+                grid-template-columns: repeat(7, minmax(24px, 1fr));
+            }
+            .chart-container-small {
+                height: 140px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -505,7 +567,7 @@
         </div>
 
         <div id="tab-last10" class="tab-pane active">
-            <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Last 10 Results</h4>
+            <h4 style="color:var(--gold); margin-bottom:6px; font-size:0.85rem;">Last 10 Results</h4>
             <div class="mini-table">
                 <table>
                     <thead><tr><th>Date</th><th>P1</th><th>Jodi</th><th>P2</th></tr></thead>
@@ -515,21 +577,21 @@
         </div>
 
         <div id="tab-jodiChart" class="tab-pane">
-            <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Jodi Trend (Last 30)</h4>
+            <h4 style="color:var(--gold); margin-bottom:6px; font-size:0.85rem;">Jodi Trend (Last 30)</h4>
             <div class="chart-container-small">
                 <canvas id="jodiChartCanvas"></canvas>
             </div>
         </div>
 
         <div id="tab-frequency" class="tab-pane">
-            <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Jodi Frequency (Top 10)</h4>
+            <h4 style="color:var(--gold); margin-bottom:6px; font-size:0.85rem;">Jodi Frequency (Top 10)</h4>
             <div class="chart-container-small">
                 <canvas id="freqChart"></canvas>
             </div>
         </div>
 
         <div id="tab-missing" class="tab-pane">
-            <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Longest Missing Jodis</h4>
+            <h4 style="color:var(--gold); margin-bottom:6px; font-size:0.85rem;">Longest Missing Jodis</h4>
             <div class="mini-table">
                 <table>
                     <thead><tr><th>Jodi</th><th>Days</th><th>Last</th></tr></thead>
@@ -539,12 +601,12 @@
         </div>
 
         <div id="tab-calendar" class="tab-pane">
-            <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Current Month Results</h4>
+            <h4 style="color:var(--gold); margin-bottom:6px; font-size:0.85rem;">Current Month Results</h4>
             <div id="calendar-container" class="calendar-grid"></div>
         </div>
 
         <div id="tab-stats" class="tab-pane">
-            <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Statistics (Last 90)</h4>
+            <h4 style="color:var(--gold); margin-bottom:6px; font-size:0.85rem;">Statistics (Last 90)</h4>
             <div class="stats-grid" id="stats-container"></div>
         </div>
     </div>
@@ -589,7 +651,6 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyd9xkyBwo-uRuBjal-GLhr-F9S39CPZ2gz65jTDcb9U2wCN1HRaJQ35X6qcWYJEY5i/exec";
     let historyData = [];
 
-    // Fallback: hide loading overlay after 10 seconds no matter what
     const loadingOverlay = document.getElementById('loading-overlay');
     setTimeout(() => {
         if (loadingOverlay.style.display !== 'none') {
@@ -662,7 +723,7 @@
         } catch (e) {
             document.getElementById('chartLoader').innerText = "ERROR LOADING HISTORY.";
             console.error(e);
-            hideLoadingOverlay(); // still hide overlay on error
+            hideLoadingOverlay();
         }
     }
 
@@ -905,7 +966,7 @@
         }, 5000);
         setInterval(() => {
             loadWeeklyChart();
-        }, 30000); // refresh history every 30 seconds, not too often
+        }, 30000);
 
         const scrollBtn = document.getElementById('scrollTopBtn');
         window.addEventListener('scroll', () => {
