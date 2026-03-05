@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Rajasthani Express | Live, Chart & Stats</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #0b0f19;
+            --card-bg: #161b2a;
+            --gold: #ffcc00;
+            --white: #ffffff;
+            --gray: #94a3b8;
+            --green: #00ff88;
+            --red: #ff4d4d;
+            --red-header: #d90429;
+            --bg-cream: #fcefb4;
+            --border: #333333;
+            --text-dark: #1b1b1b;
+            --tab-inactive: #2d3748;
+            --header-bg: #0f1422;
+            --footer-bg: #0a0e18;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body {
+            background-color: var(--bg);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 0;
+        }
+        .main-container {
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+            padding: 0 10px;
+        }
+        .header {
+            background: var(--header-bg);
+            padding: 15px 10px;
+            border-bottom: 2px solid var(--gold);
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .site-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+        .tagline {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .nav-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 12px;
+        }
+        .nav-link {
+            color: var(--white);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+        }
+        .footer {
+            background: var(--footer-bg);
+            padding: 20px 10px;
+            border-top: 2px solid var(--gold);
+            width: 100%;
+            margin-top: 30px;
+            font-size: 0.75rem;
+            color: var(--gray);
+            text-align: center;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .footer-links a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        .copyright {
+            font-size: 0.7rem;
+        }
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 5px solid rgba(255,204,0,0.2);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            color: var(--gold);
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+        .brand-title-loading {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--gold);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        .result-card {
+            background: var(--card-bg);
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            padding: 20px 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        .market-name {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .live-badge {
+            display: flex;
+            align-items: center;
+            background: var(--red);
+            color: white;
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 8px rgba(255, 77, 77, 0.5);
+        }
+        .live-dot {
+            width: 6px; height: 6px;
+            background: white;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: blink 1s infinite;
+        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,77,77,0.7); } 70% { box-shadow: 0 0 0 8px rgba(255,77,77,0); } 100% { box-shadow: 0 0 0 0 rgba(255,77,77,0); } }
+        @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+        .display-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        /* scroll-to-top button styles */
+        #scrollTopBtn {
+            position: fixed;
+            right: 20px;
+            bottom: 80px;
+            background: var(--gold);
+            color: #000;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 1000;
+            transition: opacity 0.3s;
+        }
+        #scrollTopBtn:hover {
+            background: #f59e0b;
+        }
+        .patti {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray);
+            letter-spacing: 2px;
+        }
+        .jodi {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--white);
+            background: rgba(255, 204, 0, 0.1);
+            padding: 5px 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            min-width: 70px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+        .open { background: rgba(0,255,136,0.1); color: var(--green); }
+        .closed { background: rgba(255,77,77,0.1); color: var(--red); }
+        .timing-info {
+            margin-top: 10px;
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+        .chart-title {
+            color: var(--gold);
+            margin: 15px 0 10px;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .chart-container {
+            width: 100%;
+            background: var(--bg-cream);
+            border: 2px solid var(--border);
+            overflow-x: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px;
+        }
+        th {
+            background-color: var(--red-header);
+            color: white;
+            padding: 6px 3px;
+            font-style: italic;
+            border: 1px solid white;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+        }
+        td {
+            border: 1px solid var(--border);
+            padding: 3px;
+            vertical-align: middle;
+            text-align: center;
+        }
+        .date-range-cell {
+            font-size: 0.65rem;
+            font-weight: bold;
+            line-height: 1.2;
+            padding: 5px;
+            background: #fff8e1;
+            color: var(--text-dark);
+        }
+        .day-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+        .patti-stack {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.6rem;
+            font-weight: bold;
+            line-height: 1;
+            color: #444;
+        }
+        .jodi-val {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #000;
+        }
+        .special-result { color: var(--red-header); }
+        .features-section {
+            margin: 20px 0;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 12px;
+            border: 1px solid var(--gold);
+        }
+        .tab-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .tab-btn {
+            background: var(--tab-inactive);
+            border: none;
+            color: var(--gray);
+            padding: 6px 10px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid transparent;
+            flex: 0 1 auto;
+        }
+        .tab-btn.active {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+        }
+        .tab-pane {
+            display: none;
+            animation: fade 0.3s;
+        }
+        .tab-pane.active { display: block; }
+        @keyframes fade { from { opacity:0; } to { opacity:1; } }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 10px;
+            border-left: 3px solid var(--gold);
+        }
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+        .mini-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.7rem;
+        }
+        .mini-table th,
+        .mini-table td {
+            padding: 6px 4px;
+            text-align: center;
+            word-break: break-word;
+        }
+        .mini-table th {
+            background: var(--red-header);
+            color: white;
+            font-size: 0.65rem;
+        }
+        .mini-table td {
+            border-bottom: 1px solid #333;
+            color: var(--white);
+        }
+        @media (max-width: 480px) {
+            .features-section { padding: 8px; }
+            .mini-table {
+                font-size: 0.6rem;
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                white-space: nowrap;
+            }
+            .mini-table table { width: 100%; display: table; }
+            .mini-table th, .mini-table td {
+                white-space: normal;
+                min-width: 70px;
+            }
+            #missing-body td:first-child { min-width: 45px; }
+            #missing-body td:nth-child(2) { min-width: 40px; }
+            #missing-body td:last-child { min-width: 65px; }
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            background: rgba(0,0,0,0.3);
+            padding: 5px;
+            border-radius: 8px;
+        }
+        .cal-day {
+            background: #1e293b;
+            border-radius: 4px;
+            padding: 4px 1px;
+            font-size: 0.6rem;
+            color: var(--gray);
+        }
+        .cal-day.has-result {
+            background: var(--gold);
+            color: #000;
+            font-weight: 600;
+        }
+        .cal-day .day-num { font-weight: bold; }
+        .cal-day .jodi-small { font-size: 0.55rem; }
+        .chart-container-small {
+            height: 180px;
+            margin-top: 8px;
+        }
+        #jodiChartCanvas, #freqChart {
+            max-height: 180px;
+            width: 100% !important;
+        }
+        .disclaimer {
+            margin-top: 25px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            font-size: 0.65rem;
+            color: var(--gray);
+            line-height: 1.4;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .disclaimer b { color: var(--gold); }
+        .loader { color: var(--gold); margin: 10px; font-size:0.8rem; }
+    </style>
+</head>
+<body>
+
+<div id="loading-overlay">
+    <div class="brand-title-loading">RAJASTHANI EXPRESS</div>
+    <div class="spinner"></div>
+    <div class="loading-text">LOADING...</div>
+</div>
+
+<header class="header">
+    <div class="header-content">
+        <div class="site-title">RAJASTHANI EXPRESS</div>
+        <div class="tagline">FASTEST RESULT</div>
+        <nav class="nav-bar">
+            <a href="" class="nav-link" onclick="event.preventDefault(); location.reload();">Refresh</a>
+        </nav>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="result-card">
+        <div class="market-name">
+            Active Market: <b>RAJASTHANI EXPRESS</b>
+            <span class="live-badge"><span class="live-dot"></span> LIVE</span>
+        </div>
+        <div class="display-area">
+            <div class="patti" id="livePatti1">***</div>
+            <div class="jodi" id="liveJodi">--</div>
+            <div class="patti" id="livePatti2">***</div>
+        </div>
+        <div id="liveStatus" class="status-badge">Loading...</div>
+        <div class="timing-info">Morning Close Time: 11:55 AM | Night Close Time: 6:45 PM</div>
+    </div>
+
+    
+    <div class="features-section">
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="last10">📋 Last 10</button>
+            <button class="tab-btn" data-tab="jodiChart">📈 Jodi Chart</button>
+            <button class="tab-btn" data-tab="frequency">📊 Jodi Frequency</button>
+            <button class="tab-btn" data-tab="missing">❓ Jodi Missing</button>
+            <button class="tab-btn" data-tab="calendar">📅 Calendar</button>
+            <button class="tab-btn" data-tab="stats">📈 Stats</button>
+        </div>
+
+        <div id="tab-last10" class="tab-pane active">
+            <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Last 10 Results</h4>
+            <table class="mini-table">
+                <thead><tr><th>Date</th><th>P1</th><th>Jodi</th><th>P2</th></tr></thead>
+                <tbody id="last10-body"></tbody>
+            </table>
+        </div>
+
+        <div id="tab-jodiChart" class="tab-pane">
+            <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Jodi Trend (Last 30)</h4>
+            <div class="chart-container-small">
+                <canvas id="jodiChartCanvas"></canvas>
+            </div>
+        </div>
+
+        <div id="tab-frequency" class="tab-pane">
+            <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Jodi Frequency (Top 10)</h4>
+            <div class="chart-container-small">
+                <canvas id="freqChart"></canvas>
+            </div>
+        </div>
+
+        <div id="tab-missing" class="tab-pane">
+            <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Longest Missing Jodis</h4>
+            <table class="mini-table">
+                <thead><tr><th>Jodi</th><th>Days</th><th>Last</th></tr></thead>
+                <tbody id="missing-body"></tbody>
+            </table>
+        </div>
+
+        <div id="tab-calendar" class="tab-pane">
+            <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Current Month Results</h4>
+            <div id="calendar-container" class="calendar-grid"></div>
+        </div>
+
+        <div id="tab-stats" class="tab-pane">
+            <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Statistics (Last 90)</h4>
+            <div class="stats-grid" id="stats-container"></div>
+        </div>
+    </div>
+</div>
+<h3 class="chart-title">📅 WEEKLY HISTORY</h3>
+    <div id="chartLoader" class="loader" style="display:none;">LOADING WEEKLY DATA...</div>
+    <div class="chart-container" id="chartWrapper" style="display: none;">
+        <table>
+            <thead>
+                <tr>
+                    <th>DATE</th>
+                    <th>MON</th>
+                    <th>TUE</th>
+                    <th>WED</th>
+                    <th>THU</th>
+                    <th>FRI</th>
+                    <th>SAT</th>
+                    <th>SUN</th>
+                </tr>
+            </thead>
+            <tbody id="weeklyBody"></tbody>
+        </table>
+    </div>
+
+<!-- scroll to top button -->
+<button id="scrollTopBtn" title="Scroll to top">↑</button>
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-links">
+        </div>
+        <div class="disclaimer" style="margin-top:0; background:transparent; border:none; padding:0;">
+            <b>DISCLAIMER:</b> This website is for educational and fun purposes only. We do not promote or encourage any form of illegal gambling. Please be wary of your bank account and regulations. Users assume all risk is personal liability.
+        </div>
+        <div class="copyright">
+            © 2026 Rajasthani Express. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyd9xkyBwo-uRuBjal-GLhr-F9S39CPZ2gz65jTDcb9U2wCN1HRaJQ35X6qcWYJEY5i/exec";
+    let historyData = [];
+
+    // ✅ FIXED: holiday detection now works with both string "0" and number 0
+    function isHoliday(entry) {
+        return entry.patti1 == 0 || entry.jodi === "✪";
+    }
+
+    function hideLoadingOverlay() {
+        document.getElementById('loading-overlay').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }, 500);
+    }
+
+    // ✅ IMPROVED: fetch live result and check if it's from today
+    async function fetchLive() {
+        try {
+            const res = await fetch(SCRIPT_URL + "?t=" + Date.now());
+            const data = await res.json();
+
+            // Check if the result is from today
+            const lastUpdate = new Date(data.lastUpdate);
+            const today = new Date();
+            const isFromToday = lastUpdate.toDateString() === today.toDateString();
+
+            if (!isFromToday) {
+                // No result for today yet
+                document.getElementById('livePatti1').innerText = "---";
+                document.getElementById('liveJodi').innerText   = "---";
+                document.getElementById('livePatti2').innerText = "---";
+            } else if (isHoliday(data)) {
+                document.getElementById('livePatti1').innerText = "★";
+                document.getElementById('liveJodi').innerText   = "★";
+                document.getElementById('livePatti2').innerText = "★";
+            } else {
+                document.getElementById('livePatti1').innerText = data.patti1 || "***";
+                document.getElementById('liveJodi').innerText   = data.jodi   || "--";
+                document.getElementById('livePatti2').innerText = data.patti2 || "***";
+            }
+        } catch (e) { console.warn("Live fetch error", e); }
+    }
+
+    function updateLiveStatus() {
+        const now = new Date();
+        const hour = now.getHours();
+        const statusEl = document.getElementById('liveStatus');
+        statusEl.innerText = "● MARKET OPEN";
+        statusEl.className = "status-badge open";
+    }
+
+    async function loadWeeklyChart() {
+        try {
+            const response = await fetch(SCRIPT_URL + "?type=history&t=" + Date.now());
+            const data = await response.json();
+            historyData = data;
+            const weeks = organizeIntoWeeks(data);
+            renderChart(weeks);
+
+            document.getElementById('chartLoader').style.display = 'none';
+            document.getElementById('chartWrapper').style.display = 'block';
+
+            updateLast10(data);
+            updateJodiChart(data);
+            updateFrequency(data);
+            updateMissing(data);
+            updateCalendar(data);
+            updateStats(data);
+
+            hideLoadingOverlay();
+        } catch (e) {
+            document.getElementById('chartLoader').innerText = "ERROR LOADING HISTORY.";
+            console.error(e);
+            hideLoadingOverlay();
+        }
+    }
+
+    function formatDateDDMMYY(date) {
+        if (!date) return '';
+        const d = new Date(date);
+        if (isNaN(d)) return date;
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = String(d.getFullYear()).slice(-2);
+        return `${day}/${month}/${year}`;
+    }
+
+    function organizeIntoWeeks(data) {
+        const sorted = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const weekMap = new Map();
+        sorted.forEach(item => {
+            const dateObj = new Date(item.date);
+            if (isNaN(dateObj)) return;
+            let dayOfWeek = dateObj.getDay();
+            let slotIndex;
+            if (dayOfWeek === 0) slotIndex = 6;
+            else slotIndex = dayOfWeek - 1;
+            const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            const monday = new Date(dateObj);
+            monday.setDate(dateObj.getDate() - daysToMonday);
+            monday.setHours(0,0,0,0);
+            const mondayKey = monday.toISOString().split('T')[0];
+            if (!weekMap.has(mondayKey)) {
+                const slots = new Array(7).fill(null);
+                const sunday = new Date(monday);
+                sunday.setDate(monday.getDate() + 6);
+                weekMap.set(mondayKey, { monday, sunday, slots });
+            }
+            weekMap.get(mondayKey).slots[slotIndex] = item;
+        });
+        const weeks = Array.from(weekMap.values()).sort((a,b) => b.monday - a.monday);
+        return weeks.map(week => ({
+            range: `${formatDateDDMMYY(week.monday)}<br>to<br>${formatDateDDMMYY(week.sunday)}`,
+            days: week.slots
+        }));
+    }
+
+    function renderChart(weeks) {
+        const tbody = document.getElementById('weeklyBody');
+        tbody.innerHTML = "";
+        weeks.forEach(week => {
+            const tr = document.createElement('tr');
+            let html = `<td class="date-range-cell">${week.range}</td>`;
+            for (let i = 0; i < 7; i++) {
+                const day = week.days[i];
+                if (day) {
+                    if (isHoliday(day)) {
+                        html += `<td><div class="day-box" style="font-size:1.5rem; color:var(--gold);">★</div></td>`;
+                    } else {
+                        const p1 = String(day.patti1 || '   ').padStart(3, ' ');
+                        const p2 = String(day.patti2 || '   ').padStart(3, ' ');
+                        const jodiClass = (day.jodi === "00") ? "jodi-val special-result" : "jodi-val";
+                        html += `<td><div class="day-box"><div class="patti-stack"><div>${p1[0]}</div><div>${p1[1]}</div><div>${p1[2]}</div></div><div class="${jodiClass}">${day.jodi || '--'}</div><div class="patti-stack"><div>${p2[0]}</div><div>${p2[1]}</div><div>${p2[2]}</div></div></div></td>`;
+                    }
+                } else {
+                    html += `<td></td>`;
+                }
+            }
+            tr.innerHTML = html;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function updateLast10(data) {
+        const last10 = data.slice(-10).reverse();
+        const tbody = document.getElementById('last10-body');
+        tbody.innerHTML = '';
+        last10.forEach(item => {
+            if (isHoliday(item)) {
+                tbody.innerHTML += `<tr><td>${formatDateDDMMYY(item.date)}</td><td>★</td><td>★</td><td>★</td></tr>`;
+            } else {
+                tbody.innerHTML += `<tr><td>${formatDateDDMMYY(item.date)}</td><td>${item.patti1 || '---'}</td><td>${item.jodi || '--'}</td><td>${item.patti2 || '---'}</td></tr>`;
+            }
+        });
+    }
+
+    let jodiLineChart;
+    function updateJodiChart(data) {
+        const realData = data.filter(item => !isHoliday(item) && item.jodi && !isNaN(parseInt(item.jodi)));
+        const sorted = [...realData].sort((a,b) => new Date(a.date) - new Date(b.date));
+        const last30 = sorted.slice(-30);
+        const labels = last30.map(d => formatDateDDMMYY(d.date));
+        const values = last30.map(d => parseInt(d.jodi));
+        if (jodiLineChart) jodiLineChart.destroy();
+        const ctx = document.getElementById('jodiChartCanvas').getContext('2d');
+        jodiLineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Jodi',
+                    data: values,
+                    borderColor: '#ffcc00',
+                    backgroundColor: 'rgba(255,204,0,0.1)',
+                    tension: 0.2,
+                    pointBackgroundColor: '#ffcc00'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, grid: { color: '#333' } } }
+            }
+        });
+    }
+
+    let freqChart;
+    function updateFrequency(data) {
+        const realData = data.filter(item => !isHoliday(item) && item.jodi);
+        const jodiCount = {};
+        realData.forEach(item => { jodiCount[item.jodi] = (jodiCount[item.jodi] || 0) + 1; });
+        const sorted = Object.entries(jodiCount).sort((a,b) => b[1] - a[1]).slice(0,10);
+        const labels = sorted.map(e => e[0]);
+        const values = sorted.map(e => e[1]);
+        if (freqChart) freqChart.destroy();
+        const ctx = document.getElementById('freqChart').getContext('2d');
+        freqChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Frequency',
+                    data: values,
+                    backgroundColor: 'rgba(255, 204, 0, 0.8)',
+                    borderColor: '#ffcc00',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    function updateMissing(data) {
+        const allJodis = Array.from({ length: 100 }, (_, i) => i.toString().padStart(2, '0'));
+        const lastSeen = {};
+        data.forEach(item => {
+            if (!isHoliday(item) && item.jodi) lastSeen[item.jodi] = new Date(item.date);
+        });
+        const today = new Date();
+        const missing = allJodis.map(jodi => {
+            const last = lastSeen[jodi];
+            if (!last) return { jodi, days: 999, lastDate: 'Never' };
+            const diffDays = Math.floor((today - last) / (1000*60*60*24));
+            return { jodi, days: diffDays, lastDate: formatDateDDMMYY(last) };
+        }).sort((a,b) => b.days - a.days).slice(0,15);
+        const tbody = document.getElementById('missing-body');
+        tbody.innerHTML = '';
+        missing.forEach(m => {
+            tbody.innerHTML += `<tr><td>${m.jodi}</td><td>${m.days === 999 ? '∞' : m.days}</td><td>${m.lastDate}</td></tr>`;
+        });
+    }
+
+    function updateCalendar(data) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startDayOfWeek = firstDay.getDay();
+        const daysInMonth = lastDay.getDate();
+        const resultMap = new Map();
+        data.forEach(item => {
+            const d = new Date(item.date);
+            if (d.getFullYear() === year && d.getMonth() === month) {
+                if (isHoliday(item)) {
+                    resultMap.set(d.getDate(), '★');
+                } else {
+                    resultMap.set(d.getDate(), item.jodi || '--');
+                }
+            }
+        });
+        let gridHtml = '';
+        for (let i = 0; i < startDayOfWeek; i++) gridHtml += `<div class="cal-day"></div>`;
+        for (let day = 1; day <= daysInMonth; day++) {
+            const hasRes = resultMap.has(day);
+            const jodi = resultMap.get(day) || '';
+            gridHtml += `<div class="cal-day ${hasRes ? 'has-result' : ''}"><div class="day-num">${day}</div><div class="jodi-small">${jodi}</div></div>`;
+        }
+        document.getElementById('calendar-container').innerHTML = gridHtml;
+    }
+
+    function updateStats(data) {
+        const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 90);
+        const recent = data.filter(item => new Date(item.date) >= cutoff && !isHoliday(item));
+        const jodiCount = {};
+        recent.forEach(item => { if (item.jodi) jodiCount[item.jodi] = (jodiCount[item.jodi] || 0) + 1; });
+        let mostFreqJodi = '—', mostFreqCount = 0;
+        for (let [j,c] of Object.entries(jodiCount)) { if (c > mostFreqCount) { mostFreqCount = c; mostFreqJodi = j; } }
+        let sumJodi = 0, countJodi = 0;
+        recent.forEach(item => { if (item.jodi && !isNaN(parseInt(item.jodi))) { sumJodi += parseInt(item.jodi); countJodi++; } });
+        const avgJodi = countJodi ? (sumJodi / countJodi).toFixed(1) : '—';
+        const digitCount = Array(10).fill(0);
+        recent.forEach(item => {
+            if (item.patti1) for (let ch of item.patti1.toString()) if (/\d/.test(ch)) digitCount[parseInt(ch)]++;
+            if (item.patti2) for (let ch of item.patti2.toString()) if (/\d/.test(ch)) digitCount[parseInt(ch)]++;
+        });
+        let mostCommonDigit = 0, maxDigitCount = 0;
+        digitCount.forEach((cnt, d) => { if (cnt > maxDigitCount) { maxDigitCount = cnt; mostCommonDigit = d; } });
+        const statsHtml = `
+            <div class="stat-card"><div class="stat-label">Total (90d)</div><div class="stat-value">${recent.length}</div></div>
+            <div class="stat-card"><div class="stat-label">Top Jodi</div><div class="stat-value">${mostFreqJodi} (${mostFreqCount}x)</div></div>
+            <div class="stat-card"><div class="stat-label">Avg Jodi</div><div class="stat-value">${avgJodi}</div></div>
+            <div class="stat-card"><div class="stat-label">Top Digit</div><div class="stat-value">${mostCommonDigit} (${maxDigitCount}x)</div></div>
+        `;
+        document.getElementById('stats-container').innerHTML = statsHtml;
+    }
+
+    function initTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabs.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const tabId = btn.getAttribute('data-tab');
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                document.getElementById('tab-' + tabId).classList.add('active');
+            });
+        });
+    }
+
+    window.onload = () => {
+        initTabs();
+        updateLiveStatus();
+        fetchLive();
+        loadWeeklyChart();
+        setInterval(() => {
+            updateLiveStatus();
+            fetchLive();
+        }, 5000);
+        setInterval(() => {
+            loadWeeklyChart();
+        }, 5000);
+
+        const scrollBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', () => {
+            if (document.documentElement.scrollTop > 300) {
+                scrollBtn.style.display = 'block';
+            } else {
+                scrollBtn.style.display = 'none';
+            }
+        });
+        scrollBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    };
+</script>
+
+</body>
+</html>
