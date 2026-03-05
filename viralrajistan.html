@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Admin • Rajasthani Express</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0b0f1c 0%, #1a1f33 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 14, 23, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.4s ease;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 204, 0, 0.2);
+            border-top: 4px solid #fbbf24;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            color: #fbbf24;
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Main Panel */
+        .panel {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 32px;
+            padding: 32px 24px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(251, 191, 36, 0.1) inset;
+            transition: transform 0.2s;
+        }
+
+        /* Header with logout button */
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+        .admin-header h2 {
+            color: #fbbf24;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .admin-header h2 i {
+            font-size: 2rem;
+            color: #f59e0b;
+        }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            width: auto;
+            box-shadow: none;
+        }
+        .logout-btn:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            transform: scale(1.1);
+        }
+
+        /* Login Section */
+        #login-section {
+            transition: all 0.3s;
+        }
+        label {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        input {
+            width: 100%;
+            padding: 16px 18px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #334155;
+            border-radius: 20px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s;
+            margin-bottom: 20px;
+        }
+        input:focus {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+        }
+        input:disabled {
+            opacity: 0.5;
+            background: #1e293b;
+            border-color: #475569;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.3);
+        }
+        button i { font-size: 1.1rem; }
+
+        #loginBtn {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        #loginBtn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 12px 25px -8px #fbbf24;
+        }
+
+        .update-btn {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+        }
+        .update-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 12px 25px -8px #fbbf24;
+        }
+
+        .dayoff-btn {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .dayoff-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 12px 25px -8px #ef4444;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none;
+        }
+
+        .jodi-preview {
+            font-size: 4rem;
+            font-weight: 800;
+            text-align: center;
+            color: #fbbf24;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 40px;
+            padding: 20px 10px;
+            margin: 20px 0;
+            border: 2px dashed rgba(251, 191, 36, 0.4);
+            text-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+            letter-spacing: 4px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .button-group button {
+            flex: 1;
+            padding: 14px 10px;
+            font-size: 0.9rem;
+        }
+
+        #msg {
+            text-align: center;
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Admin controls initially hidden */
+        #admin-controls {
+            display: none;
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            text-align: center;
+            color: #475569;
+            font-size: 0.7rem;
+            border-top: 1px solid #1e293b;
+            padding-top: 15px;
+        }
+        .footer-note i {
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">LOADING SECURE PANEL</div>
+    </div>
+
+    <div class="panel">
+        <!-- Login Section -->
+        <div id="login-section">
+            <h2 style="justify-content: center; margin-bottom: 28px;">
+                <i class="fas fa-crown"></i> Admin
+            </h2>
+            <label><i class="far fa-key"></i> Admin Password</label>
+            <input type="password" id="adminPass" placeholder="••••••••" autocomplete="off">
+            <button id="loginBtn" onclick="login()">
+                <i class="fas fa-unlock-alt"></i> UNLOCK SYSTEM
+            </button>
+        </div>
+
+        <!-- Admin Controls (hidden until login) -->
+        <div id="admin-controls">
+            <div class="admin-header">
+                <h2>
+                    <i class="fas fa-crown"></i> Admin
+                </h2>
+                <button class="logout-btn" onclick="logout()" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+
+            <label><i class="fas fa-door-open"></i> Open Patti (3 digits)</label>
+            <input type="number" id="patti1" oninput="validateDigits(this); calc()" placeholder="000" min="0" max="999">
+
+            <div class="jodi-preview" id="jodi-display">--</div>
+
+            <label><i class="fas fa-door-closed"></i> Close Patti (3 digits)</label>
+            <input type="number" id="patti2" oninput="validateDigits(this); calc()" placeholder="000" min="0" max="999">
+
+            <div class="button-group">
+                <button class="update-btn" id="submitBtn" onclick="updateData()">
+                    <i class="fas fa-sync-alt"></i> Update
+                </button>
+                <button class="dayoff-btn" id="dayoffBtn" onclick="setDayOff()">
+                    <i class="fas fa-star"></i> Day Off
+                </button>
+            </div>
+        </div>
+
+        <p id="msg"></p>
+        <div class="footer-note">
+            <i class="fas fa-shield-alt"></i> Secure • Session lasts until midnight
+        </div>
+    </div>
+
+    <script>
+        // ========== CONFIGURATION ==========
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyd9xkyBwo-uRuBjal-GLhr-F9S39CPZ2gz65jTDcb9U2wCN1HRaJQ35X6qcWYJEY5i/exec";
+        const ADMIN_PASSWORD = "admin123";  // ← CHANGE THIS TO YOUR SECRET PASSWORD
+        // ===================================
+
+        let global_pass = "";
+        let isUpdating = false;
+
+        // Fallback: hide loading overlay after 5 seconds
+        setTimeout(() => {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay && overlay.style.display !== 'none') {
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.style.display = 'none', 400);
+            }
+        }, 5000);
+
+        function finishLoading(showLogin = true) {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 400);
+            if (showLogin) {
+                document.getElementById('login-section').style.display = 'block';
+                document.getElementById('admin-controls').style.display = 'none';
+            } else {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('admin-controls').style.display = 'block';
+            }
+        }
+
+        // Auto-login only if stored password matches
+        (async function autoLogin() {
+            const storedPass = localStorage.getItem('adminPass');
+            const storedDate = localStorage.getItem('adminDate');
+            const today = new Date().toDateString();
+
+            if (storedPass && storedPass === ADMIN_PASSWORD && storedDate === today) {
+                global_pass = storedPass;
+                try {
+                    const res = await fetch(`${WEB_APP_URL}?t=${Date.now()}`);
+                    const data = await res.json();
+                    document.getElementById('login-section').style.display = 'none';
+                    document.getElementById('admin-controls').style.display = 'block';
+                    handleDatabaseLogic(data);
+                    document.getElementById('msg').innerText = "✓ Auto-login successful";
+                    finishLoading(false);
+                } catch (e) {
+                    localStorage.removeItem('adminPass');
+                    localStorage.removeItem('adminDate');
+                    finishLoading(true);
+                }
+            } else {
+                localStorage.removeItem('adminPass');
+                localStorage.removeItem('adminDate');
+                finishLoading(true);
+            }
+        })();
+
+        function logout() {
+            localStorage.removeItem('adminPass');
+            localStorage.removeItem('adminDate');
+            global_pass = "";
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('admin-controls').style.display = 'none';
+            document.getElementById('adminPass').value = "";
+            document.getElementById('msg').innerText = "🔒 Logged out.";
+        }
+
+        async function fetchDataAndUpdateUI() {
+            try {
+                const res = await fetch(`${WEB_APP_URL}?t=${Date.now()}`);
+                const data = await res.json();
+                handleDatabaseLogic(data);
+            } catch (e) {
+                document.getElementById('msg').innerText = "⚠️ Failed to refresh data.";
+            }
+        }
+
+        async function login() {
+            const passInput = document.getElementById('adminPass');
+            const loginBtn = document.getElementById('loginBtn');
+            const msgEl = document.getElementById('msg');
+
+            if (!passInput.value) { 
+                alert("Please enter password"); 
+                return; 
+            }
+
+            if (passInput.value !== ADMIN_PASSWORD) {
+                msgEl.innerText = "❌ Incorrect password";
+                msgEl.style.color = "#ef4444";
+                return;
+            }
+
+            const originalText = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> VALIDATING';
+            loginBtn.disabled = true;
+
+            try {
+                const res = await fetch(`${WEB_APP_URL}?t=${Date.now()}`);
+                const data = await res.json();
+                global_pass = passInput.value;
+
+                localStorage.setItem('adminPass', global_pass);
+                localStorage.setItem('adminDate', new Date().toDateString());
+
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('admin-controls').style.display = 'block';
+                handleDatabaseLogic(data);
+                msgEl.innerText = "✓ Login successful";
+                msgEl.style.color = "#22c55e";
+            } catch (e) {
+                alert("Connection Error. Try again.");
+                loginBtn.innerHTML = originalText;
+                loginBtn.disabled = false;
+            }
+        }
+
+        function validateDigits(input) {
+            if (input.value.length > 3) input.value = input.value.slice(0, 3);
+        }
+
+        function handleDatabaseLogic(data) {
+            const msgEl = document.getElementById('msg');
+            const submitBtn = document.getElementById('submitBtn');
+            const dayoffBtn = document.getElementById('dayoffBtn');
+            const p1Input = document.getElementById('patti1');
+            const p2Input = document.getElementById('patti2');
+
+            const lastUpdateTime = new Date(data.lastUpdate);
+            const today = new Date();
+            const isResultFromToday = lastUpdateTime.toDateString() === today.toDateString();
+
+            if (!isResultFromToday) {
+                p1Input.value = "";
+                p2Input.value = "";
+                p1Input.disabled = false;
+                p2Input.disabled = false;
+                submitBtn.disabled = false;
+                dayoffBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-sync-alt"></i> UPDATE LIVE';
+                msgEl.innerText = "🌅 System Ready for New Day.";
+                msgEl.style.color = "#22c55e";
+                calc();
+                return;
+            }
+
+            const now = new Date().getTime();
+            const diff = (now - lastUpdateTime.getTime()) / (1000 * 60);
+
+            if (data.patti2 && data.patti2 !== "") {
+                p1Input.value = data.patti1;
+                p2Input.value = data.patti2;
+                p1Input.disabled = true;
+                p2Input.disabled = true;
+                submitBtn.disabled = true;
+                dayoffBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-lock"></i> LOCKED';
+                msgEl.innerText = "🔒 Today's results are finalized.";
+                msgEl.style.color = "#ef4444";
+            } 
+            else if (data.patti1 && data.patti1 !== "" && diff < 5) {
+                p1Input.value = data.patti1;
+                p1Input.disabled = true;
+                p2Input.disabled = true;
+                submitBtn.disabled = true;
+                dayoffBtn.disabled = true;
+                msgEl.innerText = `⏳ Patti 1 saved. Wait ${Math.ceil(5 - diff)} min for Patti 2.`;
+                msgEl.style.color = "#fbbf24";
+            } 
+            else {
+                if (data.patti1) {
+                    p1Input.value = data.patti1;
+                    p1Input.disabled = true;
+                } else {
+                    p1Input.disabled = false;
+                }
+                p2Input.disabled = false;
+                submitBtn.disabled = false;
+                dayoffBtn.disabled = (data.patti1 && data.patti1 !== "");
+                submitBtn.innerHTML = '<i class="fas fa-sync-alt"></i> UPDATE LIVE';
+                msgEl.innerText = data.patti1 ? "✏️ Ready to update Close Patti." : "✏️ Enter Open Patti to begin.";
+                msgEl.style.color = "#22c55e";
+            }
+            calc();
+        }
+
+        function calc() {
+            let p1 = document.getElementById('patti1').value.toString();
+            let p2 = document.getElementById('patti2').value.toString();
+            let s1 = "-", s2 = "-";
+            if (p1.length === 3) s1 = (parseInt(p1[0]) + parseInt(p1[1]) + parseInt(p1[2])) % 10;
+            if (p2.length === 3) s2 = (parseInt(p2[0]) + parseInt(p2[1]) + parseInt(p2[2])) % 10;
+            document.getElementById('jodi-display').innerText = s1 + "" + s2;
+        }
+
+        async function updateData() {
+            if (isUpdating) return;
+            const btn = document.getElementById('submitBtn');
+            const p1 = document.getElementById('patti1').value;
+            const p2 = document.getElementById('patti2').value;
+
+            if (!document.getElementById('patti1').disabled && p1.length !== 3) {
+                alert("Patti 1 must be exactly 3 digits"); return;
+            }
+            if (!document.getElementById('patti2').disabled && p2.length !== 3 && p2 !== "") {
+                alert("Patti 2 must be exactly 3 digits"); return;
+            }
+
+            isUpdating = true;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> UPDATING';
+            btn.disabled = true;
+
+            const payload = {
+                password: global_pass,
+                patti1: p1,
+                patti2: p2,
+                jodi: document.getElementById('jodi-display').innerText
+            };
+
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify(payload)
+                });
+                document.getElementById('msg').innerText = "✅ Update sent. Refreshing...";
+                setTimeout(async () => {
+                    await fetchDataAndUpdateUI();
+                    isUpdating = false;
+                }, 1500);
+            } catch (error) {
+                alert("Update Failed");
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                isUpdating = false;
+            }
+        }
+
+        async function setDayOff() {
+            if (isUpdating) return;
+            if (!confirm("Mark today as holiday? This will set result to ★.")) return;
+
+            const btn = document.getElementById('dayoffBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const p1Input = document.getElementById('patti1');
+            const p2Input = document.getElementById('patti2');
+            const jodiDisplay = document.getElementById('jodi-display');
+            const msgEl = document.getElementById('msg');
+
+            const prevP1 = p1Input.value;
+            const prevP2 = p2Input.value;
+            const prevJodi = jodiDisplay.innerText;
+            const prevDisabled = {
+                p1: p1Input.disabled,
+                p2: p2Input.disabled,
+                submit: submitBtn.disabled,
+                dayoff: btn.disabled
+            };
+            const prevSubmitHTML = submitBtn.innerHTML;
+            const prevDayoffHTML = btn.innerHTML;
+
+            p1Input.value = "0";
+            p2Input.value = "0";
+            jodiDisplay.innerText = "✪";
+            p1Input.disabled = true;
+            p2Input.disabled = true;
+            submitBtn.disabled = true;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> SETTING';
+            msgEl.innerText = "⏳ Setting holiday...";
+
+            isUpdating = true;
+
+            const payload = {
+                password: global_pass,
+                patti1: "0",
+                patti2: "0",
+                jodi: "✪"
+            };
+
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify(payload)
+                });
+                msgEl.innerText = "✅ Holiday set. Refreshing...";
+                setTimeout(async () => {
+                    await fetchDataAndUpdateUI();
+                    isUpdating = false;
+                }, 1500);
+            } catch (error) {
+                alert("Failed to set holiday");
+                p1Input.value = prevP1;
+                p2Input.value = prevP2;
+                jodiDisplay.innerText = prevJodi;
+                p1Input.disabled = prevDisabled.p1;
+                p2Input.disabled = prevDisabled.p2;
+                submitBtn.disabled = prevDisabled.submit;
+                btn.disabled = prevDisabled.dayoff;
+                submitBtn.innerHTML = prevSubmitHTML;
+                btn.innerHTML = prevDayoffHTML;
+                msgEl.innerText = "❌ Holiday failed – reverted";
+                isUpdating = false;
+            }
+        }
+    </script>
+</body>
+</html>
