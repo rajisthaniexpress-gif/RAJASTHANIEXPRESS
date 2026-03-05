@@ -126,6 +126,7 @@
         .copyright {
             font-size: 0.7rem;
         }
+        /* LOADING OVERLAY – fixed, full screen, centered */
         #loading-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -136,6 +137,7 @@
             align-items: center;
             z-index: 9999;
             transition: opacity 0.5s;
+            pointer-events: none; /* allow clicking through after fade */
         }
         .spinner {
             width: 50px; height: 50px;
@@ -205,7 +207,7 @@
             align-items: center;
             margin-bottom: 15px;
         }
-        /* scroll-to-top button styles */
+        /* scroll-to-top button */
         #scrollTopBtn {
             position: fixed;
             right: 20px;
@@ -337,10 +339,10 @@
             background: var(--tab-inactive);
             border: none;
             color: var(--gray);
-            padding: 6px 10px;
+            padding: 8px 12px;  /* bigger touch target */
             border-radius: 30px;
             font-weight: 600;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: 0.2s;
             border: 1px solid transparent;
@@ -379,6 +381,7 @@
             font-weight: 700;
             color: var(--gold);
         }
+        /* Mini tables – scrollable on mobile */
         .mini-table {
             width: 100%;
             border-collapse: collapse;
@@ -386,12 +389,21 @@
             border-radius: 8px;
             overflow: hidden;
             font-size: 0.7rem;
+            display: block;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            white-space: nowrap;
+        }
+        .mini-table table {
+            min-width: 100%;
+            width: auto;
         }
         .mini-table th,
         .mini-table td {
-            padding: 6px 4px;
+            padding: 8px 6px;
             text-align: center;
             word-break: break-word;
+            min-width: 60px;
         }
         .mini-table th {
             background: var(--red-header);
@@ -402,27 +414,10 @@
             border-bottom: 1px solid #333;
             color: var(--white);
         }
-        @media (max-width: 480px) {
-            .features-section { padding: 8px; }
-            .mini-table {
-                font-size: 0.6rem;
-                display: block;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                white-space: nowrap;
-            }
-            .mini-table table { width: 100%; display: table; }
-            .mini-table th, .mini-table td {
-                white-space: normal;
-                min-width: 70px;
-            }
-            #missing-body td:first-child { min-width: 45px; }
-            #missing-body td:nth-child(2) { min-width: 40px; }
-            #missing-body td:last-child { min-width: 65px; }
-        }
+        /* calendar grid – responsive */
         .calendar-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(7, minmax(30px, 1fr));
             gap: 2px;
             background: rgba(0,0,0,0.3);
             padding: 5px;
@@ -434,6 +429,7 @@
             padding: 4px 1px;
             font-size: 0.6rem;
             color: var(--gray);
+            text-align: center;
         }
         .cal-day.has-result {
             background: var(--gold);
@@ -510,10 +506,12 @@
 
         <div id="tab-last10" class="tab-pane active">
             <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Last 10 Results</h4>
-            <table class="mini-table">
-                <thead><tr><th>Date</th><th>P1</th><th>Jodi</th><th>P2</th></tr></thead>
-                <tbody id="last10-body"></tbody>
-            </table>
+            <div class="mini-table">
+                <table>
+                    <thead><tr><th>Date</th><th>P1</th><th>Jodi</th><th>P2</th></tr></thead>
+                    <tbody id="last10-body"></tbody>
+                </table>
+            </div>
         </div>
 
         <div id="tab-jodiChart" class="tab-pane">
@@ -532,10 +530,12 @@
 
         <div id="tab-missing" class="tab-pane">
             <h4 style="color:var(--gold); margin-bottom:8px; font-size:0.9rem;">Longest Missing Jodis</h4>
-            <table class="mini-table">
-                <thead><tr><th>Jodi</th><th>Days</th><th>Last</th></tr></thead>
-                <tbody id="missing-body"></tbody>
-            </table>
+            <div class="mini-table">
+                <table>
+                    <thead><tr><th>Jodi</th><th>Days</th><th>Last</th></tr></thead>
+                    <tbody id="missing-body"></tbody>
+                </table>
+            </div>
         </div>
 
         <div id="tab-calendar" class="tab-pane">
@@ -548,8 +548,8 @@
             <div class="stats-grid" id="stats-container"></div>
         </div>
     </div>
-</div>
-<h3 class="chart-title">📅 WEEKLY HISTORY</h3>
+
+    <h3 class="chart-title">📅 WEEKLY HISTORY</h3>
     <div id="chartLoader" class="loader" style="display:none;">LOADING WEEKLY DATA...</div>
     <div class="chart-container" id="chartWrapper" style="display: none;">
         <table>
@@ -568,6 +568,7 @@
             <tbody id="weeklyBody"></tbody>
         </table>
     </div>
+</div>
 
 <!-- scroll to top button -->
 <button id="scrollTopBtn" title="Scroll to top">↑</button>
@@ -588,31 +589,35 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyd9xkyBwo-uRuBjal-GLhr-F9S39CPZ2gz65jTDcb9U2wCN1HRaJQ35X6qcWYJEY5i/exec";
     let historyData = [];
 
-    // ✅ FIXED: holiday detection now works with both string "0" and number 0
+    // Fallback: hide loading overlay after 10 seconds no matter what
+    const loadingOverlay = document.getElementById('loading-overlay');
+    setTimeout(() => {
+        if (loadingOverlay.style.display !== 'none') {
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => loadingOverlay.style.display = 'none', 500);
+        }
+    }, 10000);
+
     function isHoliday(entry) {
         return entry.patti1 == 0 || entry.jodi === "✪";
     }
 
     function hideLoadingOverlay() {
-        document.getElementById('loading-overlay').style.opacity = '0';
+        loadingOverlay.style.opacity = '0';
         setTimeout(() => {
-            document.getElementById('loading-overlay').style.display = 'none';
+            loadingOverlay.style.display = 'none';
         }, 500);
     }
 
-    // ✅ IMPROVED: fetch live result and check if it's from today
     async function fetchLive() {
         try {
             const res = await fetch(SCRIPT_URL + "?t=" + Date.now());
             const data = await res.json();
-
-            // Check if the result is from today
             const lastUpdate = new Date(data.lastUpdate);
             const today = new Date();
             const isFromToday = lastUpdate.toDateString() === today.toDateString();
 
             if (!isFromToday) {
-                // No result for today yet
                 document.getElementById('livePatti1').innerText = "---";
                 document.getElementById('liveJodi').innerText   = "---";
                 document.getElementById('livePatti2').innerText = "---";
@@ -630,7 +635,6 @@
 
     function updateLiveStatus() {
         const now = new Date();
-        const hour = now.getHours();
         const statusEl = document.getElementById('liveStatus');
         statusEl.innerText = "● MARKET OPEN";
         statusEl.className = "status-badge open";
@@ -658,7 +662,7 @@
         } catch (e) {
             document.getElementById('chartLoader').innerText = "ERROR LOADING HISTORY.";
             console.error(e);
-            hideLoadingOverlay();
+            hideLoadingOverlay(); // still hide overlay on error
         }
     }
 
@@ -901,7 +905,7 @@
         }, 5000);
         setInterval(() => {
             loadWeeklyChart();
-        }, 5000);
+        }, 30000); // refresh history every 30 seconds, not too often
 
         const scrollBtn = document.getElementById('scrollTopBtn');
         window.addEventListener('scroll', () => {
